@@ -1,12 +1,26 @@
-1) 
-Encryption of Image Using Triple DES 
-In today’s world almost all digital services like internet communication, medical 
-and military imaging systems, multimedia system needs a high level security. 
-There is a need for security level in order to safely store and transmit digital 
-images containing critical information. This is because of the faster growth in 
-multimedia technology, internet and cell phones. Therefore there is a need for 
-image encryption techniques in order to hide images from such attacks. In this 
-system we use Triple DES (Data Encryption Standard) in order to hide image. 
-Such Encryption technique helps to avoid intrusion attacks. 
-Language : Python Programming 
+Guide lines 
+ 
+1. 
+ABSTRACT 
+2. Table of Contents 
+3. Introduction 
+4. Existing Method 
+5. Proposed method with Architecture 
+6. Methodology 
+7. Implementation 
+8. Conclusion 
+These are to be present in your ziped folder. 
+1.Report 
+2.PPT 
+3.Code 
+4.Video Demo 
+NOTE: Non Developer or Non Coding Students Directly working With us. 
+ 
+The codes are to be zipped in a folder with a demo video and uploaded 
+to drive or sent to mail (exposysdatalabs@gmail.com) 
+Kindly mention which version libraries you are using 
+Example: TF 2.0, Panda 1.5v , …… 
+ 
+ 
+ 
  

@@ -2,6 +2,12 @@
 
 This project consists of a backend and a frontend to handle user-uploaded PDFs, extract their content, and answer user questions based on the content of the PDFs.
 
+
+## Demo
+<video width="320" height="240" controls>
+  <source src="./Fullstack Internship Assignment Demo.mp4" type="video/mp4">
+</video>
+
 ## Prerequisites
 
 - Python (for the backend)
@@ -66,11 +72,11 @@ Response:Success or error messages will be notified to the user.
 1.The extracted text from the PDF is saved at backend/extracted_text/extracted_text.txt. 
 
 2.User-uploaded PDFs are saved in the system under backend/uploads.
+<img src="./pdf content.png"/>
+
 <img src="./extracted text.png"/>
 
 <img  src="./upload_api.png"/>
-
-<img src="./pdf content.png"/>
 
 ### Finds the answer
 ``` bash /query/
@@ -97,6 +103,7 @@ Parameters : none
 
 ### Notifications
 Users will be notified of every success or error message during the interaction with the application.
+
 
 
 

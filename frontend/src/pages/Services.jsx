@@ -13,38 +13,51 @@ function Services() {
     const [UploadStatus, setUploadStatus] = useState()
     const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [username, setusername] = useState('')
+    const [progress, setProgress] = useState(false)
 
-     useEffect(() => {
-        console.log(messages);
-    //     const ws = new WebSocket('ws://localhost:8000/ws');
-    //     setSocket(ws);
+    useEffect(() => {
+        if (username.length <= 0 || username==undefined||username==null|| !username ) {
+            const userName = prompt("Enter User Name..!")
+            if(userName){
+                setusername(userName)
+            }
+            else{
+                setusername('User')
+            }
+        }
+        //     const ws = new WebSocket('ws://localhost:8000/ws');
+        //     setSocket(ws);
 
-    //     ws.onmessage = (event) => {
-    //         const message = event.data;
-    //         setMessages(prevMessages => [...prevMessages, message]);
-    //         //setMessages(message)
+        //     ws.onmessage = (event) => {
+        //         const message = event.data;
+        //         setMessages(prevMessages => [...prevMessages, message]);
+        //         //setMessages(message)
 
-    //     };
-    //     return () => {
-    //         ws.close();
-    //     };
+        //     };
+        //     return () => {
+        //         ws.close();
+        //     };
+        
     }, []);
-
-
     const handleFileChange = async (event) => {
         const selectedFile = event.target.files[0]
-        if (!selectedFile || selectedFile == undefined) {
-            toast.error('No file selected.');
-            return;
-        }
+
+        if (username == null || !username || username.length <= 0)
+            if (!selectedFile || selectedFile == undefined) {
+                toast.error('No file selected.');
+                return;
+            }
 
         const fileType = selectedFile.type;
         if (fileType !== 'application/pdf') {
             toast.error('Only PDF files are allowed.');
             return;
         }
+        toast.warning(`Uplaoding File`)
         const formData = new FormData();
         formData.append('pdfFile', selectedFile);
+        formData.append('username', username)
         try {
             const response = await axios.post('http://localhost:8000/upload/', formData, {
                 headers: {
@@ -55,6 +68,7 @@ function Services() {
             if (response.status === 200) {
                 setuploadedFile(selectedFile);
                 toast.success(`File uploaded successfully: ${response.data.message}`)
+                toast.info(`${response.data.check}`)
             }
         } catch (error) {
             console.log(error);
@@ -80,21 +94,21 @@ function Services() {
             toast.warning("Please Enter the Question...!")
             return
         }
-        setQuestion(inputValue)
+
         // if (!socket || socket.readyState !== WebSocket.OPEN) return;
         // socket.send(inputValue);
-
+        toast.warning("Processing Answer")
         try {
             const answer = await axios.post("http://localhost:8000/query/",
-                { "question": Question }
+                { "question": inputValue }
             )
 
 
             console.log(answer.data);
             const message = answer.data
             setMessages(prevMessages => [...prevMessages, message]);
-
-
+            setQuestion(inputValue)
+            toast.success("Answer Fetched")
         } catch (error) {
             console.log(error);
             toast.error("Unable to get data")
@@ -117,6 +131,10 @@ function Services() {
                     <span>Planet</span>
                     <small>formerly EPN</small>
                 </div>
+                {username && <div className='user-name'>
+                    <span><IoPersonCircle size={45} color='blue' /></span>
+                    <strong>{username}</strong>
+                </div>}
                 <div className="actions">
                     {uploadedFile && <a className="file-link"><FaRegFilePdf /> {uploadedFile?.name}</a>}
                     <div>
@@ -132,9 +150,8 @@ function Services() {
             </section>
             <section className='chat-box'>
                 <section className="chat-messages">
-
                     {messages.map((message, index) => (
-                        <div key={index}>
+                        <div key={index} className='chat-window'>
                             <div className="chat-message">
                                 <span><IoPersonCircle size={45} color='blue' /></span>
                                 <p>{message.question}</p>
@@ -149,8 +166,9 @@ function Services() {
                 <section className="chat-input">
                     <input type="text"
                         id="chat-input-field"
-                        placeholder="Ask Question here..."
+                        placeholder="Get me top 5 modules?(Ask Question here...)"
                         value={inputValue}
+                        disabled={!uploadedFile}
                         onChange={handleChange}
                         onKeyPress={handleKeyPress} />
                     {uploadedFile && <LuSendHorizonal id="send-btn" onClick={handelQuestion} size={30} />}
@@ -158,7 +176,7 @@ function Services() {
             </section>
             <ToastContainer
                 position="bottom-center"
-                autoClose={2500}
+                autoClose={1000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick

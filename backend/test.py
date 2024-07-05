@@ -87,9 +87,10 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     return text
 
 def answer_question_bert(context, question):
+    print(context, question)
     inputs = tokenizer.encode_plus(question, context, add_special_tokens=True, max_length=512, truncation=True, return_tensors="pt")
     input_ids = inputs["input_ids"].tolist()[0]
-
+    print(input_ids)
     text_tokens = tokenizer.convert_ids_to_tokens(input_ids)
     answer_start_scores, answer_end_scores = model(**inputs)
 
@@ -97,6 +98,7 @@ def answer_question_bert(context, question):
     answer_end = torch.argmax(answer_end_scores, dim=1).item() + 1
 
     answer = tokenizer.convert_tokens_to_string(text_tokens[answer_start:answer_end])
+    print(answer)
     return answer
 
 def split_text_into_chunks(text, max_length=512):
@@ -172,12 +174,11 @@ async def query_pdf(query: Query):
         
         # Iterate over chunks and find the best answer
         best_answer = ""
-        print(chunks)
-        # for chunk in chunks:
-        #     answer = answer_question_bert(chunk, query.question)
-        #     if answer:  # Check if the answer is not empty
-        #         best_answer = answer
-        #         break  # Stop after finding the first valid answer
+        for chunk in chunks[:2]:
+            answer = answer_question_bert(chunk, query.question)
+            if answer:  # Check if the answer is not empty
+                best_answer = answer
+                break  # Stop after finding the first valid answer
 
         return {"question": query.question, "answer": best_answer}
     except Exception as e:

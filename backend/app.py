@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket
+from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket,Form
 from pydantic import BaseModel
 import os
 import shutil
@@ -11,7 +11,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 import codecs
-from transformers import BertTokenizer, BertForQuestionAnswering
 # from langchain import LangChain 
 # from llama_index import Llama_index
 
@@ -43,6 +42,7 @@ class Document(Base):
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String, unique=True, index=True)
     upload_date = Column(DateTime, default=datetime.utcnow)
+    username=Column(String, unique=False, index=True)
 
 class Query(BaseModel):
     question: str
@@ -65,6 +65,7 @@ def get_documents():
 
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
+print(current_dir)
 upload_folder = os.path.join(current_dir, 'uploads')
 os.makedirs(upload_folder, exist_ok=True)
 
@@ -72,9 +73,6 @@ extracted_text_folder = os.path.join(current_dir, 'extracted_text')
 os.makedirs(extracted_text_folder, exist_ok=True)
 extracted_text_file = os.path.join(extracted_text_folder, 'extracted_text.txt')
 
-
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertForQuestionAnswering.from_pretrained('bert-base-uncased')
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     text = ""
@@ -89,7 +87,8 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 
 
 @app.post("/upload/")
-async def upload_pdf(pdfFile: UploadFile = File(...)):
+async def upload_pdf(pdfFile: UploadFile = File(...),username: str = Form(...)):
+
     try:
         if pdfFile.content_type != 'application/pdf':
             raise HTTPException(status_code=400, detail="Only PDF files are allowed")
@@ -102,7 +101,7 @@ async def upload_pdf(pdfFile: UploadFile = File(...)):
         
         # Save metadata to the database
         db = SessionLocal()
-        db_document = Document(filename=pdfFile.filename)
+        db_document = Document(filename=pdfFile.filename,username=username)
         db.add(db_document)
         db.commit()
         db.refresh(db_document)
@@ -116,7 +115,7 @@ async def upload_pdf(pdfFile: UploadFile = File(...)):
         with codecs.open(extracted_text_file, "w", encoding="utf-8") as text_file:
             text_file.write(text)
             
-        return JSONResponse(content={"message": f"{pdfFile.filename}","check":f"PDF processed and text extracted successfully {text}"})
+        return JSONResponse(content={"message": f"{pdfFile.filename}","check":f"PDF processed and text extracted successfully"})
        
     except Exception as e:
         print(e)
@@ -149,11 +148,9 @@ async def query_pdf(query: Query):
         with open("./backend/extracted_text/extracted_text.txt", encoding="utf-8",errors="ignore") as text_file:
             text = text_file.read()
 
-        # Initialize LangChain and LlamaIndex with the extracted text
+        # LangChain and LlamaIndex with the extracted text
         # lang_chain = LangChain(text)
         # llama_index = LlamaIndex(lang_chain)
-        
-        
 
         # Process the question using the LangChain/LlamaIndex pipeline
         #answer = llama_index.query(query.question)
@@ -162,13 +159,13 @@ async def query_pdf(query: Query):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()  
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     await websocket.accept()  
 
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(data)
+#     while True:
+#         data = await websocket.receive_text()
+#         await websocket.send_text(data)
 
 if __name__ == "__main__":
     import uvicorn

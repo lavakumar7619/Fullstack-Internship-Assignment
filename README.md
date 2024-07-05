@@ -66,6 +66,11 @@ Response:Success or error messages will be notified to the user.
 1.The extracted text from the PDF is saved at backend/extracted_text/extracted_text.txt. 
 
 2.User-uploaded PDFs are saved in the system under backend/uploads.
+<img src="./extracted text.png"/>
+
+<img  src="./upload_api.png"/>
+
+<img src="./pdf content.png"/>
 
 ### Finds the answer
 ``` bash /query/
@@ -80,13 +85,14 @@ Response:The answer to the question based on the content of the uploaded PDF.
 
 Success or error messages will be notified to the user.
 
+<img src="./Question_answer_api.png"/>
 
 ### Gets all documents saved in sqllite database
 ``` bash /documents/
 Method : Get
 Parameters : none
 ```
-
+<img src="./db.png"/>
 
 
 ### Notifications

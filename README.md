@@ -47,7 +47,9 @@ The frontend runs at port 3000.
 
 3.Upon uploading a PDF file, the user can ask questions related to the content of the uploaded PDF.
 
-### Backend API
+## Backend API
+
+### PDF Uplaod
 ```bash /upload/ 
 Method : POST
 Parameter : - pdfFile (File)
@@ -65,6 +67,7 @@ Response:Success or error messages will be notified to the user.
 
 2.User-uploaded PDFs are saved in the system under backend/uploads.
 
+### Finds the answer
 ``` bash /query/
 method :POST
 paramters : - Question (string)
@@ -76,6 +79,15 @@ Request Body:question: The question to be answered.
 Response:The answer to the question based on the content of the uploaded PDF.
 
 Success or error messages will be notified to the user.
+
+
+### Gets all documents saved in sqllite database
+``` bash /documents/
+Method : Get
+Parameters : none
+```
+
+
 
 ### Notifications
 Users will be notified of every success or error message during the interaction with the application.
